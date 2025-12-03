@@ -93,6 +93,23 @@ void fillMaxEnergyTable(int n, vector<vector<unsigned long long>>& maxEnergy, ve
     }
 }
 
+
+void buildRemovalOrder(int i, int j,const vector<vector<int>>& lastRemoved, vector<int>& order) {
+    //Invalid interval
+    if(i > j) return;
+
+    int removedIdx = lastRemoved[i][j];
+
+    if(i < removedIdx) {
+        buildRemovalOrder(i, removedIdx - 1, lastRemoved, order);
+    }
+    if(j > removedIdx) {
+        buildRemovalOrder(removedIdx + 1, j, lastRemoved, order);
+    }
+
+    order.push_back(removedIdx + 1);
+}
+
 vector<int> getRemovalOrder(int n, const vector<vector<int>>& lastRemoved) {
     vector<int> order;
     order.reserve(n);
@@ -103,37 +120,7 @@ vector<int> getRemovalOrder(int n, const vector<vector<int>>& lastRemoved) {
 
     int pos = 0;
 
-    //Process intervals: colect all intervals to process
-    while(pos < intervals.size()) {
-        int i = intervals[pos].first;
-        int j = intervals[pos].second;
-        pos++;
-
-        //Avoid invalid intervals (i > j when there are no more amino acids to remove)
-        if(i > j) continue;
-
-        int removedIdx = lastRemoved[i][j];
-
-        if(i < removedIdx) {
-            intervals.push_back({i, removedIdx - 1});
-        }
-        if(j > removedIdx) {
-            intervals.push_back({removedIdx + 1, j});
-        }
-    }
-
-    //Process intervals in reverse order to get the correct removal order
-    for(int idx = intervals.size() - 1; idx >= 0; idx--) {
-        int i = intervals[idx].first;
-        int j = intervals[idx].second;
-
-        if(i > j) continue;
-
-        int removedIdx = lastRemoved[i][j];
-
-        order.push_back(removedIdx + 1);
-    }
-
+    buildRemovalOrder(0, n-1, lastRemoved, order);
     return order;
 }
 
