@@ -22,29 +22,28 @@ int biochemicalClass(char c) {
         case 'N': return 1;
         case 'A': return 2;
         case 'B': return 3;
-        case 'T': return 4;
-        default:;
+        default: return 4;
     }
 }
 
-//Calculates the energy released when removing the amino acid at position i
+//Calculates the total released when removing the amino acid at position i
 unsigned long long calculateEnergy(int posLeft, int posMiddle, int posRight, 
                                     const vector<int>& stabilityPotentials, 
                                     const vector<int>& biochemicalClasses) {
     
     //Calculate the potencial(P) of each one
-    int P_left = (posLeft == -1) ? TERMINAL_POTENTIAL : stabilityPotentials[posLeft];
+    int P_left = ((posLeft < 0) ? TERMINAL_POTENTIAL : stabilityPotentials[posLeft]);
     int P_middle = stabilityPotentials[posMiddle];
-    int P_right = (posRight == stabilityPotentials.size()) ? TERMINAL_POTENTIAL : stabilityPotentials[posRight];
+    int P_right = ((posRight >= (int)stabilityPotentials.size()) ? TERMINAL_POTENTIAL : stabilityPotentials[posRight]);
 
     //Calculate the biochemical class (BC) of each one
-    int BC_left = (posLeft == -1) ? biochemicalClass('T') : biochemicalClasses[posLeft];
+    int BC_left = (posLeft < 0) ? biochemicalClass('T') : biochemicalClasses[posLeft];
     int BC_middle = biochemicalClasses[posMiddle];
-    int BC_right = (posRight == biochemicalClasses.size()) ? biochemicalClass('T') : biochemicalClasses[posRight];
+    int BC_right = ((posRight >= (int)biochemicalClasses.size()) ? biochemicalClass('T') : biochemicalClasses[posRight]);
 
-    //Calculate energy
-    unsigned long long E1 = P_left*affinity[BC_left][BC_middle]*P_middle;
-    unsigned long long E2 = P_middle*affinity[BC_middle][BC_right]*P_right;
+    //Calculate total
+    unsigned long long E1 = (unsigned long long)P_left*affinity[BC_left][BC_middle]*P_middle;
+    unsigned long long E2 = (unsigned long long)P_middle*affinity[BC_middle][BC_right]*P_right;
 
     return E1 + E2;
 }
@@ -54,34 +53,34 @@ unsigned long long calculateEnergy(int posLeft, int posMiddle, int posRight,
 void calculateTotalEnergy(int n, int i, int j, 
                             vector<vector<unsigned long long>>& maxEnergy,
                             vector<vector<int>>& lastRemoved,
-                            vector<int> stabilityPotentials, 
-                            vector<int> biochemicalClasses) {
+                            const vector<int>& stabilityPotentials, 
+                            const vector<int>& biochemicalClasses) {
 
-    int max = 0;
-    int max_idx = 0;
+    unsigned long long best = 0;
+    int best_idx = 0;
 
     for (int idx = i; idx <= j; idx++) {
-        unsigned long long leftEnergy = (idx - 1 >= i) ? maxEnergy[i][idx - 1] : 0;
-        unsigned long long rightEnergy = (idx + 1 <= j) ? maxEnergy[idx + 1][j] : 0;
+        unsigned long long leftEnergy = ((idx > i) ? maxEnergy[i][idx - 1] : 0);
+        unsigned long long rightEnergy = ((idx < j) ? maxEnergy[idx + 1][j] : 0);
         unsigned long long middleEnergy = calculateEnergy(i-1, idx, j+1, stabilityPotentials, biochemicalClasses);
 
-        unsigned long long energy = leftEnergy + middleEnergy + rightEnergy;
+        unsigned long long total = leftEnergy + middleEnergy + rightEnergy;
         
-        if (max < energy || (max == energy && max_idx < idx)) {
-            max = energy;
-            max_idx = idx;
+        if (best < total || (best == total && best_idx < idx)) {
+            best = total;
+            best_idx = idx;
         }
     }
 
-    maxEnergy[i][j] = max;
-    lastRemoved[i][j] = max_idx;
+    maxEnergy[i][j] = best;
+    lastRemoved[i][j] = best_idx;
     return;
 }
 
 
 
 void fillMaxEnergyTable(int n, vector<vector<unsigned long long>>& maxEnergy, vector<vector<int>>& lastRemoved, 
-                            vector<int> stabilityPotentials, vector<int> biochemicalClasses){
+                            const vector<int>& stabilityPotentials, const vector<int>& biochemicalClasses){
 
     //Fill maxEnergy table for intervals of increasing size (iterative)
     for(int intervalSize = 1; intervalSize <= n; intervalSize++) {
@@ -96,6 +95,7 @@ void fillMaxEnergyTable(int n, vector<vector<unsigned long long>>& maxEnergy, ve
 
 vector<int> getRemovalOrder(int n, const vector<vector<int>>& lastRemoved) {
     vector<int> order;
+    order.reserve(n);
 
     //Process intervals: colect all intervals to process
     vector<pair<int, int>> intervals;
@@ -140,6 +140,9 @@ vector<int> getRemovalOrder(int n, const vector<vector<int>>& lastRemoved) {
 
 
 int main() {
+    ios_base::sync_with_stdio(false);
+    cin.tie(NULL);
+
 
     //number of amino acids in the sequence
     int n;
@@ -163,7 +166,7 @@ int main() {
 
     
 
-    //maxEnergy[l][r] = maximum energy when removing all amino acids in interval [l,r]
+    //maxEnergy[l][r] = maximum total when removing all amino acids in interval [l,r]
     vector<vector<unsigned long long>> maxEnergy(n, vector<unsigned long long>(n));
     //lastRemoved[l][r] = last amino acid removed in interval [l,r]
     vector<vector<int>> lastRemoved(n, vector<int>(n, -1));
