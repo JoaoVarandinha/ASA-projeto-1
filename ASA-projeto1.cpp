@@ -94,33 +94,55 @@ void fillMaxEnergyTable(int n, vector<vector<unsigned long long>>& maxEnergy, ve
 }
 
 
-void buildRemovalOrder(int i, int j,const vector<vector<int>>& lastRemoved, vector<int>& order) {
-    //Invalid interval
-    if(i > j) return;
 
-    int removedIdx = lastRemoved[i][j];
-
-    if(i < removedIdx) {
-        buildRemovalOrder(i, removedIdx - 1, lastRemoved, order);
-    }
-    if(j > removedIdx) {
-        buildRemovalOrder(removedIdx + 1, j, lastRemoved, order);
-    }
-
-    order.push_back(removedIdx + 1);
-}
 
 vector<int> getRemovalOrder(int n, const vector<vector<int>>& lastRemoved) {
     vector<int> order;
     order.reserve(n);
 
-    //Process intervals: colect all intervals to process
-    vector<pair<int, int>> intervals;
-    intervals.push_back({0,n-1});
+    /*Stack to process intervals iteratively 
+      (interval[i, j], shouldAdd)
+      shouldAdd = false -> first time we "see" the interval, so we need to process it
+      shouldAdd = true -> interval has been processed, we can add the last removed to the order
+    */
+    vector<pair<pair<int, int>, bool>> stack;
+    
+    //Inicialize with the whole interval
+    stack.push_back({{0, n-1}, false});
+    
+    while(!stack.empty()) {
+        pair<int, int> interval = stack.back().first;
+        bool shouldAdd = stack.back().second;
 
-    int pos = 0;
+        //Remove the last element
+        stack.pop_back();
 
-    buildRemovalOrder(0, n-1, lastRemoved, order);
+        int i = interval.first;
+        int j = interval.second;
+
+        //Invalid inteval
+        if(i > j) continue;
+
+        int lastRemovedIdx = lastRemoved[i][j];
+
+        if(shouldAdd) {
+            //Add to the order
+            order.push_back(lastRemovedIdx + 1);
+        } else {
+            //First time we see the interval [i, j]
+            //Process the subintervals first and then add the last removed (1st left, 2nd rignt, 3rd current)
+            
+            //Push the current interval to add it later
+            stack.push_back(make_pair(make_pair(i, j), true));
+
+            //Push right subinterval
+            stack.push_back(make_pair(make_pair(lastRemovedIdx + 1, j), false));
+
+            //Push left subinterval
+            stack.push_back(make_pair(make_pair(i, lastRemovedIdx - 1), false));
+        }
+    }
+
     return order;
 }
 
