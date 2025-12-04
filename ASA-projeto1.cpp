@@ -32,9 +32,9 @@ unsigned long long calculateEnergy(int posLeft, int posMiddle, int posRight,
                                     const vector<int>& biochemicalClasses) {
     
     //Calculate the potencial(P) of each one
-    int P_left = ((posLeft < 0) ? TERMINAL_POTENTIAL : stabilityPotentials[posLeft]);
-    int P_middle = stabilityPotentials[posMiddle];
-    int P_right = ((posRight >= (int)stabilityPotentials.size()) ? TERMINAL_POTENTIAL : stabilityPotentials[posRight]);
+    unsigned long long P_left = ((posLeft < 0) ? TERMINAL_POTENTIAL : stabilityPotentials[posLeft]);
+    unsigned long long P_middle = stabilityPotentials[posMiddle];
+    unsigned long long P_right = ((posRight >= (int)stabilityPotentials.size()) ? TERMINAL_POTENTIAL : stabilityPotentials[posRight]);
 
     //Calculate the biochemical class (BC) of each one
     int BC_left = (posLeft < 0) ? biochemicalClass('T') : biochemicalClasses[posLeft];
@@ -42,8 +42,8 @@ unsigned long long calculateEnergy(int posLeft, int posMiddle, int posRight,
     int BC_right = ((posRight >= (int)biochemicalClasses.size()) ? biochemicalClass('T') : biochemicalClasses[posRight]);
 
     //Calculate total
-    unsigned long long E1 = (unsigned long long)P_left*affinity[BC_left][BC_middle]*P_middle;
-    unsigned long long E2 = (unsigned long long)P_middle*affinity[BC_middle][BC_right]*P_right;
+    unsigned long long E1 = P_left*affinity[BC_left][BC_middle]*P_middle;
+    unsigned long long E2 = P_middle*affinity[BC_middle][BC_right]*P_right;
 
     return E1 + E2;
 }
