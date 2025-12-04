@@ -187,9 +187,9 @@ int main() {
     //Output
     cout << maxEnergy[0][n-1] << "\n";
 
-    for(int size = 0; size < removalOrder.size(); size++) {
+    for (int size = 0; size < (int)removalOrder.size(); size++) {
         cout << removalOrder[size];
-        if(size < removalOrder.size() - 1) cout << " ";
+        if (size < (int)removalOrder.size() - 1) cout << " ";
     }
     cout << "\n";
 
