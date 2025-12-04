@@ -28,7 +28,7 @@ int biochemicalClass(char c) {
 
 //Calculates the total released when removing the amino acid at position i
 unsigned long long calculateEnergy(int posLeft, int posMiddle, int posRight, 
-                                    const vector<int>& stabilityPotentials, 
+                                    const vector<unsigned long long>& stabilityPotentials, 
                                     const vector<int>& biochemicalClasses) {
     
     //Calculate the potencial(P) of each one
@@ -53,7 +53,7 @@ unsigned long long calculateEnergy(int posLeft, int posMiddle, int posRight,
 void calculateTotalEnergy(int n, int i, int j, 
                             vector<vector<unsigned long long>>& maxEnergy,
                             vector<vector<int>>& lastRemoved,
-                            const vector<int>& stabilityPotentials, 
+                            const vector<unsigned long long>& stabilityPotentials, 
                             const vector<int>& biochemicalClasses) {
 
     unsigned long long best = 0;
@@ -80,7 +80,7 @@ void calculateTotalEnergy(int n, int i, int j,
 
 
 void fillMaxEnergyTable(int n, vector<vector<unsigned long long>>& maxEnergy, vector<vector<int>>& lastRemoved, 
-                            const vector<int>& stabilityPotentials, const vector<int>& biochemicalClasses){
+                            const vector<unsigned long long>& stabilityPotentials, const vector<int>& biochemicalClasses){
 
     //Fill maxEnergy table for intervals of increasing size (iterative)
     for(int intervalSize = 1; intervalSize <= n; intervalSize++) {
@@ -158,7 +158,7 @@ int main() {
     cin >> n;
 
     //vector with all stability potentials of the n amino acids
-    vector<int> stabilityPotentials(n);
+    vector<unsigned long long> stabilityPotentials(n);
     for(int i = 0; i < n; i++) {
         cin >> stabilityPotentials[i];
     }
