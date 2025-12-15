@@ -48,8 +48,6 @@ unsigned long long calculateEnergy(int posLeft, int posMiddle, int posRight,
     return E1 + E2;
 }
 
-
-
 void calculateTotalEnergy(int n, int i, int j, 
                             vector<vector<unsigned long long>>& maxEnergy,
                             vector<vector<int>>& lastRemoved,
@@ -77,8 +75,6 @@ void calculateTotalEnergy(int n, int i, int j,
     return;
 }
 
-
-
 void fillMaxEnergyTable(int n, vector<vector<unsigned long long>>& maxEnergy, vector<vector<int>>& lastRemoved, 
                             const vector<unsigned long long>& stabilityPotentials, const vector<int>& biochemicalClasses){
 
@@ -92,9 +88,6 @@ void fillMaxEnergyTable(int n, vector<vector<unsigned long long>>& maxEnergy, ve
         }
     }
 }
-
-
-
 
 vector<int> getRemovalOrder(int n, const vector<vector<int>>& lastRemoved) {
     vector<int> order;
@@ -147,10 +140,9 @@ vector<int> getRemovalOrder(int n, const vector<vector<int>>& lastRemoved) {
 }
 
 
-
 int main() {
-    ios_base::sync_with_stdio(false);
-    cin.tie(NULL);
+    ios_base::sync_with_stdio(0);
+    cin.tie(0);
 
 
     //number of amino acids in the sequence
